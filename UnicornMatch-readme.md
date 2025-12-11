@@ -1,7 +1,6 @@
 UnicornMatch Resume Analysis Tool
 
-Live site
-https://www.unicornmatch.app/
+Live site: https://www.unicornmatch.app/
 
 UnicornMatch is a resume analysis and job match evaluation tool created to help jobseekers understand how well their resume fits a selected role. It provides structured scoring, breakdowns and improvement suggestions supported by a controlled large language model workflow.
 
@@ -17,7 +16,7 @@ Applicants waste hours rewriting resumes without clear guidance.
 
 Recruiters receive high volume but low relevance submissions.
 
-Most resume tools only provide keyword checks, not structured analysis.
+Most resume tools only provide keyword checks and not structured analysis.
 
 UnicornMatch solves this by providing a fast and objective analysis that reflects how real recruiters screen resumes.
 
@@ -36,6 +35,7 @@ Deliver a smooth and friendly user experience without technical friction.
 3. System Overview
 
 The platform combines structured scoring layers with controlled LLM logic.
+
 The engine processes:
 
 Resume text
@@ -79,7 +79,7 @@ Role specific indicators
 
 Controlled LLM Evaluation
 
-Rule based prompt design to ensure:
+Rule based prompt design ensures:
 
 Consistent scoring
 
@@ -101,16 +101,16 @@ Messaging written for jobseekers rather than technical users
 
 Brand and Voice
 
-UnicornMatch is designed to feel supportive and energy positive, turning a stressful process into one with clarity and guidance.
+UnicornMatch is designed to feel supportive and encouraging, turning a stressful process into one with clarity and guidance.
 
 5. Architecture Summary (Redacted)
-User Upload  
-   -> Text Extraction  
-   -> Preprocessing  
-   -> Scoring Framework  
-   -> LLM Evaluation  
-   -> Quality Check  
-   -> Result Assembly  
+User Upload
+   -> Text Extraction
+   -> Preprocessing
+   -> Scoring Framework
+   -> LLM Evaluation
+   -> Quality Check
+   -> Result Assembly
    -> Frontend Display
 
 
@@ -128,7 +128,7 @@ Caching for cost optimisation
 
 6. Sample Artifacts
 
-(These are safe for a public repo. You can add real files later.)
+These are safe for a public repo. You can add real files later.
 
 flow-diagram.png
 

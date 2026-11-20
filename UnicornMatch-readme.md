@@ -1,117 +1,184 @@
-# UnicornMatch Resume Analysis Tool
+# UnicornMatch: AI-Powered Resume Scoring, Gap Analysis & The Council of HRRR
 
-**Live site:** [https://www.unicornmatch.app/](https://www.unicornmatch.app/)
+UnicornMatch is a production SaaS platform designed to eliminate the guesswork of job applications by evaluating resumes against target job descriptions using Google Gemini AI. Rather than generating surface-level keyword counts, the platform provides deep semantic compatibility scoring, missing competency audits, rewrite-ready feedback, and multi-perspective critique from five distinct AI hiring personas.
 
-UnicornMatch is a resume analysis and job match evaluation tool created to help jobseekers understand how well their resume fits a selected role. It provides structured scoring, breakdowns, and improvement suggestions supported by a controlled large language model workflow.
+I designed and engineered the entire application end to end: React 19 frontend architecture, client-side PDF/DOCX parsing, 14+ Deno edge functions on Supabase, PostgreSQL RLS security policies, Stripe credit billing, and a proprietary AI-text fingerprint sanitization engine.
 
-This document outlines the product intent, system design, user experience, and technical choices used to build the platform. Redacted examples and non-sensitive artifacts are included to demonstrate approach and thinking.
+> **Source Code Notice:** The source repository is proprietary and private. This document details the platform's architectural topology, design decisions, data flow models, and subsystem scale. Proprietary prompt chains, scoring matrices, and production API credentials are deliberately omitted (see Section 7).
 
-## 1. Problem Statement
+[![Live Platform](https://img.shields.io/badge/Platform-unicornmatch.app-f43f5e?style=flat-square)](https://www.unicornmatch.app/)
+[![Database & Auth](https://img.shields.io/badge/Supabase-PostgreSQL%20%7C%20RLS-3ecf8e?style=flat-square)](https://supabase.com)
+[![Scale](https://img.shields.io/badge/Codebase-~20%2C250%20LoC-6366f1?style=flat-square)](#6-by-the-numbers)
+[![License](https://img.shields.io/badge/License-All%20Rights%20Reserved-zinc?style=flat-square)](#10-license--intellectual-property)
+[![Stack](https://img.shields.io/badge/React%2019-Vite%20%7C%20TypeScript-blue?style=flat-square)](https://react.dev)
 
-Jobseekers often do not know how well their resume aligns with a job description. Recruiters and hiring managers spend time screening mismatched resumes without a consistent framework.
+---
 
-**Key issues observed:**
-*   Applicants waste hours rewriting resumes without clear guidance.
-*   Recruiters receive high volume but low relevance submissions.
-*   Most resume tools only provide keyword checks and not structured analysis.
+## 1. The Problem
 
-UnicornMatch solves this by providing a fast and objective analysis that reflects how real recruiters screen resumes.
+The modern hiring market is characterized by extreme asymmetry between job seekers and Applicant Tracking Systems (ATS). Job applicants face three fundamental structural challenges:
 
-## 2. Product Goals
+*   **Asymmetric ATS Filtering & Silent Rejections:** Companies receive hundreds of applicants per role and deploy automated ATS filters. Job seekers apply blindly without knowing how their resume matches the job description, frequently being rejected without actionable feedback.
+*   **Shallow Keyword Counting vs. Semantic Alignment:** Most commercial "resume checkers" perform naive substring matching (e.g., checking if the exact phrase *"cross-functional leadership"* appears). They fail to evaluate contextual competency, seniority alignment, or evidence of tangible business impact.
+*   **The "AI Fingerprint" Penalty:** Candidates using standard ChatGPT prompts often paste text filled with robotic buzzwords, em-dash overuse, and invisible zero-width Unicode artifacts left behind by LLM generators—triggering anti-AI heuristics in hiring pipelines.
 
-*   Give jobseekers a clear, structured understanding of their resume quality.
-*   Provide practical improvement suggestions they can act on immediately.
-*   Create a scoring and feedback system that simulates recruiter-style evaluation.
-*   Reduce guesswork and help users identify gaps in both content and presentation.
-*   Deliver a smooth and friendly user experience without technical friction.
+UnicornMatch solves this by delivering structured, recruiter-grade semantic scoring, actionable gap analyses, multi-angle HR evaluation, and an automated sanitization engine that produces ATS-ready rewrites free of AI tells.
 
-## 3. System Overview
+---
 
-The platform combines structured scoring layers with controlled LLM logic.
+## 2. What It Does
 
-### The engine processes:
-*   Resume text
-*   Job description text
-*   Context and user selections
-*   Internal scoring framework
-*   Structured prompts for evaluator consistency
+*   **Semantic Resume-vs-JD Compatibility Engine:** Computes an objective Unicorn Match Score by semantically comparing candidate experience against job requirements via Google Gemini, highlighting matched competencies, missing core skills, and experience red flags.
+*   **The Council of HRRR:** Eliminates the flaw of single-number scoring by convening five distinct AI-driven hiring personas (`/council`), each offering unfiltered perspectives:
+    1.  *The Hard-Nosed Tech Lead:* Evaluates technical depth, architecture choices, and concrete execution.
+    2.  *The Startup Founder:* Assesses speed, versatility, autonomy, and cross-functional ownership.
+    3.  *The Corporate Recruiter:* Scans for ATS keyword density, formatting discipline, and career progression.
+    4.  *The Culture Champion:* Reviews collaboration language, mentorship, and interpersonal resonance.
+    5.  *The Strict Executive:* Focuses strictly on business impact, ROI, metrics, and strategic alignment.
+*   **Proprietary AI Fingerprint Sanitizer:** Automatically scrubs invisible zero-width characters, non-standard whitespace, and AI-flavored typography (`unllm` + custom cleaning rules) from all generated rewrite recommendations, making suggestions safe to paste directly into documents without triggering detection algorithms. Public interactive demo hosted at `/ai-fingerprints`.
+*   **Section-by-Section Resume Health Workspace:** A persistent `/resume` manager where users break down their resume into modular components (Summary, Experience, Education) for isolated re-scoring and iterative polishing over time.
+*   **Client-Side In-Browser Document Extraction:** Extracts clean plain text directly in the browser from PDF and DOCX files (`pdfjs-dist`, `mammoth`) without transmitting unparsed binary blobs to backend servers.
+*   **Direct Job Posting URL Scraping:** Extracts and cleans job requirements directly from live posting URLs, stripping surrounding boilerplate, navigation headers, and footer noise.
+*   **Stripe-Backed Credit Economy:** Production credit purchasing ("Magic Credits") backed by transactional Stripe Checkout and cryptographic webhook fulfillment with atomic database transactions.
 
-### Output includes:
-*   Overall match score
-*   Breakdown across core categories
-*   Strengths
-*   Gaps and opportunities
-*   Targeted rewrite suggestions
+---
 
-A multi-layer safety and validation step ensures stability when users upload messy resumes or incomplete job descriptions.
+## 3. Product Surface
 
-## 4. Key Features
+| Subsystem | What the User Gets |
+|---|---|
+| **Match Analysis Workspace** | Dual input dashboard with PDF/DOCX drag-and-drop, live URL extraction, real-time progress steps, and comprehensive scoring reports |
+| **The Council of HRRR** | Dedicated interactive panel featuring 5 distinct recruiter personas delivering independent, unvarnished critiques of the candidate's profile |
+| **My Resume (Health Tracker)** | Modular resume builder tracking health scores per section with single-click AI rechecks and persistent versioning |
+| **AI Fingerprint Cleaner** | Interactive public diagnostic tool demonstrating invisible Unicode artifact detection and one-click typography normalization |
+| **User Dashboard** | Secure user history displaying previous analyses, credit balances, transaction receipts, and stored resumes |
+| **Authentication & Profile** | Frictionless sign-in via Google OAuth or passwordless email magic links managed through Supabase Auth |
+| **Billing & Credit Management** | Self-serve Stripe Checkout integration with automated webhook credit balance synchronization |
 
-### Structured Scoring Engine
-A customised evaluation system that measures:
-*   Relevance to role
-*   Skills and competencies
-*   Experience alignment
-*   Clarity and readability
-*   Role-specific indicators
+---
 
-### Controlled LLM Evaluation
-Rule-based prompt design ensures:
-*   Consistent scoring
-*   No hallucination of non-existent skills
-*   Stable output formats
-*   Defensive checks when inputs are weak
+## 4. Architecture
 
-### User Friendly Interface
-*   Simple upload and paste workflow
-*   Clear progress state
-*   Clean results page with scannable sections
-*   Messaging written for jobseekers rather than technical users
-
-### Brand and Voice
-UnicornMatch is designed to feel supportive and encouraging, turning a stressful process into one with clarity and guidance.
-
-## 5. Architecture Summary (Redacted)
-
-```mermaid
-graph TD
-    UU[User Upload] --> TE[Text Extraction]
-    TE --> PP[Preprocessing]
-    PP --> SF[Scoring Framework]
-    SF --> LLM[LLM Evaluation]
-    LLM --> QC[Quality Check]
-    QC --> RA[Result Assembly]
-    RA --> FD[Frontend Display]
+```
+   [ User Browser: React 19 + Vite + TypeScript ]
+         |
+         +--> [ Client-Side Document Parsing: pdfjs-dist / mammoth ]
+         |
+         v
+   +-----------------------------------------------------------+
+   |   Supabase Deno Edge Functions Layer                      |
+   |   - Bearer Token Authentication & Rate Limiting           |
+   |   - Payload Validation & Job Posting Sanitizer            |
+   +-----------------------------------------------------------+
+         |
+         +---------------------------------------+
+         |                                       |
+         v                                       v
+   +---------------------------+   +---------------------------+
+   |  Google Gemini API        |   |  Stripe Billing Engine    |
+   |  - Semantic Match Engine  |   |  - Checkout Sessions      |
+   |  - 5 Council HR Personas  |   |  - Webhook Event Handlers |
+   |  - Section Health Scorer  |   +---------------------------+
+   +---------------------------+                 |
+         |                                       |
+         v                                       v
+   +-----------------------------------------------------------+
+   |   Text Sanitization Engine (unllm + regex cleaners)       |
+   |   - Strips Zero-Width Spaces & Invisible Unicode Artifacts|
+   |   - Normalizes AI Typography & Cliché Phrasing            |
+   +-----------------------------------------------------------+
+         |
+         v
+   +-----------------------------------------------------------+
+   |   PostgreSQL Database (Supabase Managed)                  |
+   |   - Strict Row Level Security (RLS) on all user data      |
+   |   - Credit Ledger & Atomic Transaction Balance Decrements |
+   |   - Saved Resumes & Historical Analysis Snapshots         |
+   +-----------------------------------------------------------+
 ```
 
-### Supporting components include:
-*   Input validators
-*   Normalisation utilities
-*   Error handling layer
-*   Prompt control modules
-*   Caching for cost optimisation
+### Key Architectural Decisions
 
-## 6. Sample Artifacts
+*   **Client-Side Document Parsing over Server-Side Workers:** Rather than uploading multi-megabyte binary PDF/DOCX files to serverless edge functions—incurring bandwidth costs and execution timeout risks—parsing occurs entirely in the browser using `pdfjs-dist` and `mammoth`. Edge functions receive clean, pre-sanitized text payloads, keeping function execution under 1 second.
+*   **Multi-Agent Personas over Unified Score Averaging:** Standard resume tools average evaluations into a generic 75% score, which obscures critical weaknesses. The Council of HRRR isolates evaluation criteria into independent prompt threads, mirroring how real hiring committees debate candidates with conflicting priorities.
+*   **Invisible Character Sanitization as a First-Class Output Layer:** Generated rewrites pass through an automated cleanup pipeline (`unllm` and zero-width character scrubbers) before reaching the user, ensuring suggestions are safe to paste into resumes without triggering automated anti-AI filters.
+*   **Database-Centric Credit Ledger with RLS:** Magic credit balances and consumption transactions are enforced directly within PostgreSQL via Row Level Security (RLS) policies and atomic decrements, preventing double-spend exploits or race conditions from concurrent client requests.
 
-These are safe for a public repo. You can add real files later.
-*   `flow-diagram.png`
-*   `scoring-framework-overview.md`
-*   `redacted-prompt-structure.md`
-*   `ui-mockups.png`
-*   `processing-pipeline-notes.md`
+---
 
-## 7. Why This Project Matters
+## 5. Tech Stack
 
-UnicornMatch connects multiple strengths:
-*   Product thinking
-*   Human behaviour understanding
-*   AI system design
-*   Structured evaluation systems
-*   Branding and communication
-*   UX for real users under stress
+| Layer | Choice |
+|---|---|
+| **Frontend Framework** | React 19, TypeScript, Vite 5/6 |
+| **Routing & State** | React Router v6, React Context (AuthContext single source of truth) |
+| **Styling & Animation** | Tailwind CSS, Framer Motion (page transitions and interactive cards) |
+| **Data Visualizations** | Recharts (category radar charts, match score gauges) |
+| **Icons & Typography** | Lucide React, Plus Jakarta Sans |
+| **Backend & Edge Functions**| Supabase (Deno Edge Functions: 14+ microservices) |
+| **Database & Security** | PostgreSQL 15+ with strict Row Level Security (RLS) policies |
+| **Authentication** | Supabase Auth (Google OAuth 2.0 & passwordless magic links) |
+| **AI & NLP Inference** | Google Gemini API (`@google/genai`) |
+| **Text Sanitization** | `unllm`, custom Unicode & invisible-character cleaning routines |
+| **Document Processing** | `pdfjs-dist` (PDF extraction), `mammoth` (DOCX parsing) |
+| **Payments & Billing** | Stripe Checkout API, Stripe Webhooks |
 
-It is both a consumer-facing product and a technical demonstration of controlled model-based scoring.
+---
 
-## 8. Access to Full Implementation
+## 6. By the Numbers
 
-The core engine, scoring logic, and production prompts are stored in private repos to protect IP. Hirers who wish to review deeper technical details can request temporary access.
+| Metric | Figure |
+|---|---|
+| **Active Codebase** | **~20,250 lines of code** across 109 frontend and edge files |
+| **Edge Microservices** | **14+ Supabase Deno functions** (`analyze-resume`, `convene-council`, etc.) |
+| **Database Migrations** | **26 version-controlled PostgreSQL migrations** |
+| **Evaluation Personas** | **5 distinct Council HR perspectives** |
+| **Document Parsing** | **100% in-browser client-side extraction** (zero server PDF storage) |
+| **Security Architecture**| **Strict Row Level Security (RLS)** covering 100% of user tables |
+| **Commercial Billing** | Live Stripe webhook processing with atomic credit fulfillment |
+
+### Subsystems Breakdown
+
+*   `components/`: 34 modular React components covering the Welcome landing page, Analysis Result dashboards, My Resume section manager, Council of HRRR panels, and billing modals.
+*   `supabase/functions/analyze-resume/`: Core resume-vs-JD evaluation pipeline processing semantic match, keyword categorization, and rewrite drafting.
+*   `supabase/functions/convene-council/`: Parallel evaluation engine driving the 5 distinct HR persona reactions.
+*   `supabase/functions/_shared/textSanitizer.ts`: Proprietary cleaning library stripping invisible Unicode markers and normalizing AI typography.
+*   `services/`: Frontend API bridge coordinating Supabase client calls, edge function invocations, client-side document parsers, and Stripe checkouts.
+*   `supabase/migrations/`: 26 SQL migration files establishing user credit ledgers, analysis run history, saved resume sections, and strict RLS policies.
+
+---
+
+## 7. What Is Not In Here, On Purpose
+
+This repository is published for technical demonstration and recruitment evaluation. It deliberately omits:
+
+*   Proprietary Gemini system prompts and behavioral rubrics for the 5 Council of HRRR personas.
+*   The exact internal weights and scoring algorithms governing the Unicorn Match Score.
+*   Production Supabase service role secrets, Stripe webhook signing keys, and Google OAuth client secrets.
+*   Live production customer records and stored resume analysis data.
+
+Live architectural walkthroughs or staging demonstrations can be scheduled upon request.
+
+---
+
+## 8. What I Would Point You To
+
+*   **Client-Side Document Extraction Architecture:** Zero-overhead text parsing in the browser (`pdfjs-dist`, `mammoth`), completely eliminating server-side file upload bottlenecks.
+*   **The Council of HRRR Evaluation Topology:** How independent AI hiring personas provide nuanced, actionable critique without flattening feedback into generic averages.
+*   **AI Fingerprint & Invisible Unicode Sanitizer:** The real-time cleanup layer preventing AI watermarks, zero-width spaces, and typographic artifacts from leaking into candidate resumes.
+*   **Production Billing & RLS Integrity:** Robust Stripe webhook integration paired with atomic database-level credit decrementing under strict PostgreSQL Row Level Security.
+
+---
+
+## 9. Links
+
+*   **Live SaaS Application:** [https://www.unicornmatch.app/](https://www.unicornmatch.app/)
+*   **Author:** Rayner Lim ([LinkedIn](https://www.linkedin.com/in/raynerlim/))
+
+---
+
+## 10. License & Intellectual Property
+
+© 2026 Rayner Lim. All rights reserved.
+
+This repository, documentation, architecture diagrams, and associated showcase materials are proprietary and published solely for demonstration and recruitment evaluation purposes. No license is granted to copy, reproduce, fork, redistribute, or build derivative commercial products from this project without explicit written permission from the author.

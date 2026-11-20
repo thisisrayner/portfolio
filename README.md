@@ -67,5 +67,5 @@ To balance technical transparency for recruiters and engineering leaders with in
   * EmpathAIc: [https://empathaic.com](https://empathaic.com)
   * HypaSignal: [https://hypasignal.com](https://hypasignal.com)
   * Brandori: [https://brandori.app](https://brandori.app)
-  * Shadee.Care: [https://shadee.care](https://shadee.care)
+  * Shadee.Care: [https://shadee.care](https://shadee.care) (Internal tool, no public access)
   * UnicornMatch: [https://www.unicornmatch.app/](https://www.unicornmatch.app/)

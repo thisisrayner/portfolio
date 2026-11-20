@@ -9,7 +9,7 @@ I designed and built it end to end as a solo developer: product, UX, architectur
 [![Live Platform](https://img.shields.io/badge/Live-hypasignal.com-indigo?style=flat-square)](https://hypasignal.com)
 [![License](https://img.shields.io/badge/License-All%20Rights%20Reserved-zinc?style=flat-square)](#10-license--intellectual-property)
 [![Stack](https://img.shields.io/badge/React%2019-Vite%206-blue?style=flat-square)](https://react.dev)
-[![Backend](https://img.shields.io/badge/Supabase-PostgreSQL-emerald?style=flat-square)](https://supabase.com)
+[![Backend](https://img.shields.io/badge/Backend-PostgreSQL%20%7C%20RLS-emerald?style=flat-square)](https://www.postgresql.org)
 
 ## 1. The Problem
 
@@ -49,10 +49,10 @@ Three problems follow from that:
 ```
   Browser (React SPA)
         |
-        |  Supabase JS client (RLS-enforced) + Edge Function calls
+        |  Database client (RLS-enforced) + Edge Function calls
         v
   +-------------------------------+      +--------------------------+
-  |  Supabase Postgres            | <--> |  Edge Functions (Deno)   |
+  |  Managed PostgreSQL           | <--> |  Edge Functions (Deno)   |
   |  RLS on every table           |      |  ~90 functions           |
   |  SECURITY DEFINER RPCs        |      |  AI, search, email,      |
   |  pg_cron + queue tables       |      |  billing, cron workers   |
@@ -78,13 +78,13 @@ Three problems follow from that:
 | Frontend | React 19, TypeScript 5.8, Vite 6, Tailwind CSS 3, React Router 7 |
 | Data fetching | TanStack Query with optimistic updates |
 | i18n | i18next, 3 locales, lazy-loaded namespaces, CI check for missing keys |
-| Backend | Supabase: Postgres, Auth, Row Level Security, Edge Functions on Deno |
+| Backend | Managed PostgreSQL, Auth, Row Level Security, Serverless Edge Functions (Deno) |
 | AI | Large language model (LLM), with and without live web grounding, structured output |
 | Billing | Stripe Checkout, Customer Portal and webhooks across two Stripe accounts |
 | Email | Transactional and campaign email over SMTP, with open, click and reply tracking |
 | Scheduling | pg_cron, GitHub Actions and a Cloudflare Worker for heartbeat and watchdog jobs |
 | Testing | Vitest (unit), Playwright (end to end), Deno tests for shared backend logic |
-| Hosting | Vercel (front end), Supabase (back end), Cloudflare (DNS and edge) |
+| Hosting | Global Edge CDN (front end), Managed Cloud Postgres & Serverless (back end), Cloudflare (DNS and edge) |
 
 ## 6. By the Numbers
 

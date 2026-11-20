@@ -1,13 +1,13 @@
 # UnicornMatch: AI-Powered Resume Scoring, Gap Analysis & The Council of HRRR
 
-UnicornMatch is a production SaaS platform designed to eliminate the guesswork of job applications by evaluating resumes against target job descriptions using Google Gemini AI. Rather than generating surface-level keyword counts, the platform provides deep semantic compatibility scoring, missing competency audits, rewrite-ready feedback, and multi-perspective critique from five distinct AI hiring personas.
+UnicornMatch is a production SaaS platform designed to eliminate the guesswork of job applications by evaluating resumes against target job descriptions using an LLM. Rather than generating surface-level keyword counts, the platform provides deep semantic compatibility scoring, missing competency audits, rewrite-ready feedback, and multi-perspective critique from five distinct AI hiring personas.
 
-I designed and engineered the entire application end to end: React 19 frontend architecture, client-side PDF/DOCX parsing, 14+ Deno edge functions on Supabase, PostgreSQL RLS security policies, Stripe credit billing, and a proprietary AI-text fingerprint sanitization engine.
+I designed and engineered the entire application end to end: React 19 frontend architecture, client-side PDF/DOCX parsing, 14+ serverless Deno edge functions, PostgreSQL RLS security policies, Stripe credit billing, and a proprietary AI-text fingerprint sanitization engine.
 
 > **Source Code Notice:** The source repository is proprietary and private. This document details the platform's architectural topology, design decisions, data flow models, and subsystem scale. Proprietary prompt chains, scoring matrices, and production API credentials are deliberately omitted (see Section 7).
 
 [![Live Platform](https://img.shields.io/badge/Platform-unicornmatch.app-f43f5e?style=flat-square)](https://www.unicornmatch.app/)
-[![Database & Auth](https://img.shields.io/badge/Supabase-PostgreSQL%20%7C%20RLS-3ecf8e?style=flat-square)](https://supabase.com)
+[![Database & Auth](https://img.shields.io/badge/Database-PostgreSQL%20%7C%20RLS-3ecf8e?style=flat-square)](https://www.postgresql.org)
 [![Scale](https://img.shields.io/badge/Codebase-~20%2C250%20LoC-6366f1?style=flat-square)](#6-by-the-numbers)
 [![License](https://img.shields.io/badge/License-All%20Rights%20Reserved-zinc?style=flat-square)](#10-license--intellectual-property)
 [![Stack](https://img.shields.io/badge/React%2019-Vite%20%7C%20TypeScript-blue?style=flat-square)](https://react.dev)
@@ -28,7 +28,7 @@ UnicornMatch solves this by delivering structured, recruiter-grade semantic scor
 
 ## 2. What It Does
 
-*   **Semantic Resume-vs-JD Compatibility Engine:** Computes an objective Unicorn Match Score by semantically comparing candidate experience against job requirements via Google Gemini, highlighting matched competencies, missing core skills, and experience red flags.
+*   **Semantic Resume-vs-JD Compatibility Engine:** Computes an objective Unicorn Match Score by semantically comparing candidate experience against job requirements via an LLM, highlighting matched competencies, missing core skills, and experience red flags.
 *   **The Council of HRRR:** Eliminates the flaw of single-number scoring by convening five distinct AI-driven hiring personas (`/council`), each offering unfiltered perspectives:
     1.  *The Hard-Nosed Tech Lead:* Evaluates technical depth, architecture choices, and concrete execution.
     2.  *The Startup Founder:* Assesses speed, versatility, autonomy, and cross-functional ownership.
@@ -52,7 +52,7 @@ UnicornMatch solves this by delivering structured, recruiter-grade semantic scor
 | **My Resume (Health Tracker)** | Modular resume builder tracking health scores per section with single-click AI rechecks and persistent versioning |
 | **AI Fingerprint Cleaner** | Interactive public diagnostic tool demonstrating invisible Unicode artifact detection and one-click typography normalization |
 | **User Dashboard** | Secure user history displaying previous analyses, credit balances, transaction receipts, and stored resumes |
-| **Authentication & Profile** | Frictionless sign-in via Google OAuth or passwordless email magic links managed through Supabase Auth |
+| **Authentication & Profile** | Frictionless sign-in via Google OAuth or passwordless email magic links managed through a cloud authentication service |
 | **Billing & Credit Management** | Self-serve Stripe Checkout integration with automated webhook credit balance synchronization |
 
 ---
@@ -66,7 +66,7 @@ UnicornMatch solves this by delivering structured, recruiter-grade semantic scor
          |
          v
    +-----------------------------------------------------------+
-   |   Supabase Deno Edge Functions Layer                      |
+   |   Serverless Deno Edge Functions Layer                    |
    |   - Bearer Token Authentication & Rate Limiting           |
    |   - Payload Validation & Job Posting Sanitizer            |
    +-----------------------------------------------------------+
@@ -75,7 +75,7 @@ UnicornMatch solves this by delivering structured, recruiter-grade semantic scor
          |                                       |
          v                                       v
    +---------------------------+   +---------------------------+
-   |  Google Gemini API        |   |  Stripe Billing Engine    |
+   |  LLM API                  |   |  Stripe Billing Engine    |
    |  - Semantic Match Engine  |   |  - Checkout Sessions      |
    |  - 5 Council HR Personas  |   |  - Webhook Event Handlers |
    |  - Section Health Scorer  |   +---------------------------+
@@ -90,7 +90,7 @@ UnicornMatch solves this by delivering structured, recruiter-grade semantic scor
          |
          v
    +-----------------------------------------------------------+
-   |   PostgreSQL Database (Supabase Managed)                  |
+   |   PostgreSQL Database (Cloud Managed)                     |
    |   - Strict Row Level Security (RLS) on all user data      |
    |   - Credit Ledger & Atomic Transaction Balance Decrements |
    |   - Saved Resumes & Historical Analysis Snapshots         |
@@ -115,10 +115,10 @@ UnicornMatch solves this by delivering structured, recruiter-grade semantic scor
 | **Styling & Animation** | Tailwind CSS, Framer Motion (page transitions and interactive cards) |
 | **Data Visualizations** | Recharts (category radar charts, match score gauges) |
 | **Icons & Typography** | Lucide React, Plus Jakarta Sans |
-| **Backend & Edge Functions**| Supabase (Deno Edge Functions: 14+ microservices) |
+| **Backend & Edge Functions**| Serverless Edge Functions (Deno: 14+ microservices) |
 | **Database & Security** | PostgreSQL 15+ with strict Row Level Security (RLS) policies |
-| **Authentication** | Supabase Auth (Google OAuth 2.0 & passwordless magic links) |
-| **AI & NLP Inference** | Google Gemini API (`@google/genai`) |
+| **Authentication** | Managed Cloud Auth (Google OAuth 2.0 & passwordless magic links) |
+| **AI & NLP Inference** | LLM API |
 | **Text Sanitization** | `unllm`, custom Unicode & invisible-character cleaning routines |
 | **Document Processing** | `pdfjs-dist` (PDF extraction), `mammoth` (DOCX parsing) |
 | **Payments & Billing** | Stripe Checkout API, Stripe Webhooks |
@@ -130,7 +130,7 @@ UnicornMatch solves this by delivering structured, recruiter-grade semantic scor
 | Metric | Figure |
 |---|---|
 | **Active Codebase** | **~20,250 lines of code** across 109 frontend and edge files |
-| **Edge Microservices** | **14+ Supabase Deno functions** (`analyze-resume`, `convene-council`, etc.) |
+| **Edge Microservices** | **14+ Serverless Deno functions** (`analyze-resume`, `convene-council`, etc.) |
 | **Database Migrations** | **26 version-controlled PostgreSQL migrations** |
 | **Evaluation Personas** | **5 distinct Council HR perspectives** |
 | **Document Parsing** | **100% in-browser client-side extraction** (zero server PDF storage) |
@@ -140,11 +140,11 @@ UnicornMatch solves this by delivering structured, recruiter-grade semantic scor
 ### Subsystems Breakdown
 
 *   `components/`: 34 modular React components covering the Welcome landing page, Analysis Result dashboards, My Resume section manager, Council of HRRR panels, and billing modals.
-*   `supabase/functions/analyze-resume/`: Core resume-vs-JD evaluation pipeline processing semantic match, keyword categorization, and rewrite drafting.
-*   `supabase/functions/convene-council/`: Parallel evaluation engine driving the 5 distinct HR persona reactions.
-*   `supabase/functions/_shared/textSanitizer.ts`: Proprietary cleaning library stripping invisible Unicode markers and normalizing AI typography.
-*   `services/`: Frontend API bridge coordinating Supabase client calls, edge function invocations, client-side document parsers, and Stripe checkouts.
-*   `supabase/migrations/`: 26 SQL migration files establishing user credit ledgers, analysis run history, saved resume sections, and strict RLS policies.
+*   `edge-functions/analyze-resume/`: Core resume-vs-JD evaluation pipeline processing semantic match, keyword categorization, and rewrite drafting.
+*   `edge-functions/convene-council/`: Parallel evaluation engine driving the 5 distinct HR persona reactions.
+*   `edge-functions/_shared/textSanitizer.ts`: Proprietary cleaning library stripping invisible Unicode markers and normalizing AI typography.
+*   `services/`: Frontend API bridge coordinating database client calls, edge function invocations, client-side document parsers, and Stripe checkouts.
+*   `db/migrations/`: 26 SQL migration files establishing user credit ledgers, analysis run history, saved resume sections, and strict RLS policies.
 
 ---
 
@@ -152,9 +152,9 @@ UnicornMatch solves this by delivering structured, recruiter-grade semantic scor
 
 This repository is published for technical demonstration and recruitment evaluation. It deliberately omits:
 
-*   Proprietary Gemini system prompts and behavioral rubrics for the 5 Council of HRRR personas.
+*   Proprietary LLM system prompts and behavioral rubrics for the 5 Council of HRRR personas.
 *   The exact internal weights and scoring algorithms governing the Unicorn Match Score.
-*   Production Supabase service role secrets, Stripe webhook signing keys, and Google OAuth client secrets.
+*   Production database service role secrets, Stripe webhook signing keys, and Google OAuth client secrets.
 *   Live production customer records and stored resume analysis data.
 
 Live architectural walkthroughs or staging demonstrations can be scheduled upon request.

@@ -10,7 +10,7 @@ I designed and engineered the platform end to end as a solo builder: prompt topo
 [![Research Pipeline](https://img.shields.io/badge/Research-Live%20Scraping%20%26%20Scoring-indigo?style=flat-square)](#2-what-it-does)
 [![Frameworks](https://img.shields.io/badge/Frameworks-5%20Archetypes-teal?style=flat-square)](#2-what-it-does)
 [![License](https://img.shields.io/badge/License-All%20Rights%20Reserved-zinc?style=flat-square)](#10-license--intellectual-property)
-[![Stack](https://img.shields.io/badge/Python%203.10-Streamlit%20%7C%20Gemini-amber?style=flat-square)](https://streamlit.io)
+[![Stack](https://img.shields.io/badge/Python%203.10-Streamlit%20%7C%20LLM-amber?style=flat-square)](https://streamlit.io)
 
 ---
 
@@ -28,7 +28,7 @@ Shadee.Care Editorial Studio solves this by combining a real-time web research a
 
 ## 2. What It Does
 
-*   **Two-Tier AI Model Orchestration:** Dynamically partitions editorial tasks between a high-empathy Writer AI (`gemini-3-flash-preview` / `gemini-2.5-pro`) for nuanced prose synthesis and a lightweight Researcher AI (`gemini-3.5-flash-lite`) for rapid candidate filtering and citation analysis.
+*   **Two-Tier AI Model Orchestration:** Dynamically partitions editorial tasks between a high-empathy Writer AI (frontier LLM) for nuanced prose synthesis and a lightweight Researcher AI (fast LLM) for rapid candidate filtering and citation analysis.
 *   **Live Web Research & 0–5 Relevance Scoring:** Automatically harvests up to 30 candidate sources across live web queries; scrapes each source in real time; and runs AI relevance scoring against mental health research ontologies. Only sources scoring $\ge 3/5$ are admitted into the verified briefing ledger; paywalled, bot-blocked, or low-relevance links are discarded.
 *   **Iterative Search Query Refinement:** If initial search passes yield low thematic diversity, the research engine detects knowledge gaps and fires targeted secondary queries to uncover clinical perspectives or lived-experience contexts.
 *   **5 Canonical Narrative Frameworks (+ Creative Mode):** Eliminates repetitive formatting by allowing writers (or an automated AI selector) to apply distinct narrative structures:
@@ -82,7 +82,7 @@ Shadee.Care Editorial Studio solves this by combining a real-time web research a
                   |
                   v
    +---------------------------------------------+
-   |   Researcher AI (gemini-3.5-flash-lite)     |
+   |   Researcher AI (Lightweight LLM)           |
    |   - 0–5 Relevance Scoring Matrix            |
    |   - Quality Gate: Discard if Score < 3/5    |
    |   - Thematic Gap Analysis & Re-query        |
@@ -91,7 +91,7 @@ Shadee.Care Editorial Studio solves this by combining a real-time web research a
                   | Verified Citations + Key Insights
                   v
    +---------------------------------------------+
-   |   Writer AI (gemini-3-flash-preview / 2.5)  |
+   |   Writer AI (Frontier LLM)                  |
    |   - 5 Narrative Framework Prompt Modules    |
    |   - Youth Tone & Singlish/Cultural Rules    |
    |   - Crisis Helpline & Safety Gate Injection |
@@ -117,7 +117,7 @@ Shadee.Care Editorial Studio solves this by combining a real-time web research a
 ### Key Architectural Decisions
 
 *   **Live Web Scraping & Scoring over Static RAG:** Mental health discourse evolves alongside digital trends (e.g., algorithmic burnout, cyberbullying patterns, academic pressure spikes). Relying on a static vector database would leave writers with outdated context. Combining live search with real-time scraping and strict AI relevance scoring ensures up-to-the-minute citations without infrastructure bloat.
-*   **Two-Tier Model Routing for Cost & Latency:** Evaluating 30 candidate articles using high-parameter frontier models causes unacceptable latency and API expense. By utilizing `gemini-3.5-flash-lite` for citation parsing and relevance scoring, the pipeline processes dozens of sources in under 5 seconds, reserving `gemini-3-flash-preview` exclusively for the final creative synthesis.
+*   **Two-Tier Model Routing for Cost & Latency:** Evaluating 30 candidate articles using high-parameter frontier models causes unacceptable latency and API expense. By utilizing a lightweight LLM for citation parsing and relevance scoring, the pipeline processes dozens of sources in under 5 seconds, reserving a frontier LLM exclusively for the final creative synthesis.
 *   **Mandatory Human-in-the-Loop Pre-Flight Gate:** Fully autonomous content generation in clinical mental health is fundamentally irresponsible. The architecture deliberately requires human validation: drafts are paired with an interactive pre-flight checklist, ensuring no content reaches publication without human review.
 *   **Native Cookie Session Architecture in Streamlit:** Streamlit re-executes its script on every interaction, which frequently causes session loss or UI flicker during state changes. Engineered custom cookie persistence via `st.context.cookies` and secure `SameSite=Lax` tokens, maintaining 24-hour persistent logins without third-party dependencies.
 
@@ -128,8 +128,8 @@ Shadee.Care Editorial Studio solves this by combining a real-time web research a
 | Layer | Choice |
 |---|---|
 | **UI & Workspace Application** | Python 3.10+, Streamlit (Wide-screen responsive layout, custom CSS theming) |
-| **Writer AI Engine** | Google Gemini API (`gemini-3-flash-preview` / `gemini-2.5-pro`) |
-| **Researcher AI & Scorer** | Google Gemini API (`gemini-3.5-flash-lite`) |
+| **Writer AI Engine** | LLM API (frontier reasoning & prose model) |
+| **Researcher AI & Scorer** | LLM API (lightweight high-throughput model) |
 | **Search Engine Client** | Google Custom Search Engine (CSE) API with quota management |
 | **Web Scraping & Parsing** | `requests`, `BeautifulSoup4`, regex fallback cleaners |
 | **Data Normalization** | `pandas`, `pydantic`, JSON structured schemas |
@@ -153,7 +153,7 @@ Shadee.Care Editorial Studio solves this by combining a real-time web research a
 ### Subsystems Breakdown
 
 *   `app.py`: Streamlit application shell, dark indigo interface styling, tabbed editorial navigation, session state rehydration.
-*   `utils/gemini_helper.py`: Research ingestion pipeline, live web scraping, 0–5 relevance evaluation, multi-query expansion logic.
+*   `utils/llm_helper.py`: Research ingestion pipeline, live web scraping, 0–5 relevance evaluation, multi-query expansion logic.
 *   `utils/gpt_helper.py`: Writer AI synthesis engine, 5 narrative framework prompt templates, crisis hotline rules, social studio formats.
 *   `utils/search_engine.py`: Google CSE API client, query quota management, domain exclusion lists.
 *   `utils/scraper.py`: Resilient web scraper with HTTP header rotation, anti-bot detection, and clean text extraction.

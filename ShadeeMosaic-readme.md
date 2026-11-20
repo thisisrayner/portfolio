@@ -34,7 +34,7 @@ Shadee Mosaic solves this by continuously ingesting, triaging, and vectorizing c
 *   **Sub-Second Semantic Retrieval (`< 500ms`):** Powered by an `IVFFlat` vector index over 260,000+ 768-dimensional embeddings, allowing researchers to execute conceptual similarity queries (e.g., *"sandwich-generation caregiver burnout with insomnia"*) across the entire multi-year corpus.
 *   **Recursive Thematic Saturation Protocol:** A self-auditing research engine that dynamically samples narratives at incremental sample sizes ($N=100 \rightarrow N=500 \rightarrow N=1,000$), calculating thematic stability to assure researchers that a qualitative finding has reached saturation.
 *   **Atmosphere Pulse:** Correlates semantic narrative clusters with quantitative Google Trends search frequency to track societal-level shifts in mental health interest over time.
-*   **Sentinel Health & Downtime Watchdog:** An automated alert engine that monitors database connectivity, Gemini API quota/billing health, and scraper execution, dispatching emergency diagnostic emails within seconds of any pipeline degradation.
+*   **Sentinel Health & Downtime Watchdog:** An automated alert engine that monitors database connectivity, LLM API quota/billing health, and scraper execution, dispatching emergency diagnostic emails within seconds of any pipeline degradation.
 
 ---
 
@@ -48,7 +48,7 @@ Shadee Mosaic solves this by continuously ingesting, triaging, and vectorizing c
 | **Clinical Triage Workspace** | Audit view showing raw content, PII-scrubbed text, canonical bucket mappings, clinical risk justifications, and model confidence scores |
 | **Session History Manager** | Persistent sidebar storing historical research queries, applied filters, and synthesis reports with one-click state rehydration |
 | **Upstream Ingestion Funnels** | Precision scrapers running daily at 06:00 SGT with automated deduplication and zero Google Sheets dependency |
-| **Sentinel Alert Watchdog** | Automated alerting engine monitoring Supabase write latency, Gemini API quota exhaustion, and scraper uptime |
+| **Sentinel Alert Watchdog** | Automated alerting engine monitoring database write latency, LLM API quota exhaustion, and scraper uptime |
 
 ---
 
@@ -98,7 +98,7 @@ Shadee Mosaic solves this by continuously ingesting, triaging, and vectorizing c
 ### Key Architectural Decisions
 
 *   **IVFFlat Indexing over HNSW for Massive Dynamic Datasets:** For high-volume ingestion (~3,800 rows/day), HNSW index build times and memory overhead degrade rapidly on constrained instances. Transitioned to an optimized `IVFFlat` index (385 centroids calibrated to $\sqrt{N}$), achieving sub-500ms P95 query times with low build overhead and predictable memory consumption.
-*   **Two-Tier Triage Pipeline (Compute Optimization):** To avoid burning millions of LLM tokens on spam, data passes through a lightweight Tier-1 regex triage baseline to discard commercial artifacts and flag clear categories, reserving deep Gemini LLM classification strictly for nuanced, conversational text.
+*   **Two-Tier Triage Pipeline (Compute Optimization):** To avoid burning millions of LLM tokens on spam, data passes through a lightweight Tier-1 regex triage baseline to discard commercial artifacts and flag clear categories, reserving deep LLM classification strictly for nuanced, conversational text.
 *   **Demographic Polysemy Calibration:** Language that signifies severe clinical crisis in an adult (e.g., financial retrenchment + multi-day insomnia) carries vastly different diagnostic implications when used in adolescent slang. The classification layer conditions its clinical risk evaluation on inferred life stages (`youth` vs. `middle_age`), preventing hyperbole false-positives.
 *   **PostgREST Compatibility Layer:** Ingestion and classification communicate via a PostgREST abstraction layer, enabling seamless portability between managed cloud database providers and self-hosted Dockerized PostgreSQL without rewriting client code.
 *   **Fail-Safe Sentinel Alerting:** Replaced routine daily "all-clear" emails with an exception-driven alert engine. The pipeline runs completely silent on success, but immediately triggers formatted SMTP alerts with stack traces upon database drops, API quota exhaustion, or scraper authentication errors.
@@ -110,9 +110,9 @@ Shadee Mosaic solves this by continuously ingesting, triaging, and vectorizing c
 | Layer | Choice |
 |---|---|
 | **Core Backend & API** | Python 3.10+, FastAPI (Async, SSE Streaming, Singleton DB connection) |
-| **Vector Database & Lake** | PostgreSQL 16 with `pgvector` extension, hosted on Supabase Pro / Docker |
+| **Vector Database & Lake** | PostgreSQL 16 with `pgvector` extension, hosted on Managed Cloud PostgreSQL / Docker |
 | **Vector Indexing** | `IVFFlat` index with 385 lists, cosine distance operator (`<=>`) |
-| **AI Models & Embeddings** | Google Gemini API (`gemini-3.5-flash-lite` for batch classification; `gemini-embedding-001` for 768d vectors; `gemini-2.5` for research synthesis) |
+| **AI Models & Embeddings** | LLM API (lightweight LLM for batch classification; 768d embedding model for vectors; frontier LLM for research synthesis) |
 | **Data Pipelines & Scraping** | Python (`praw` for Reddit, `google-api-python-client` for YouTube, `pytumblr`, `pytrends`) |
 | **Data Processing & Math** | `pandas`, `numpy`, `tenacity` (retry decorators with exponential jitter) |
 | **Alerting & Monitoring** | SMTP / TLS Sentinel Engine with automated HTML diagnostic payloads |
@@ -129,7 +129,7 @@ Shadee Mosaic solves this by continuously ingesting, triaging, and vectorizing c
 | **Total Vector Embeddings** | **260,000+ 768-dimensional float arrays** |
 | **Daily Ingestion Throughput** | **~3,700 – 3,950 posts/day** across Reddit, YouTube, and Tumblr |
 | **Vector Search Latency** | **< 450ms P95** across filtered 260k+ corpus |
-| **Active Codebase (Mosaic & Social Listen)** | **~16,000 lines of code** (Python, SQL, TypeScript/HTML, Workflows) |
+| **Active Codebase** | **~16,000 lines of code** (Python, SQL, TypeScript/HTML, Workflows) |
 | **Automated Workflows** | 5 active GitHub Actions cron pipelines |
 | **Reliability Record** | **100% consecutive uptime** across scheduled daily runs |
 | **Classification Accuracy** | 17 narrative buckets, 5-tier risk severity, demographic tagging |
@@ -140,7 +140,7 @@ Shadee Mosaic solves this by continuously ingesting, triaging, and vectorizing c
 *   **Classifier & Triage Engine:** 10-post batching harness with rate-limit pacing, 3-attempt backoff retries, and strict foreign-key normalization.
 *   **PII Sanitizer & Data Moat:** Regex and semantic scrubbers that strip personal handles, names, phone numbers, and identifying URLs prior to embedding.
 *   **Thematic Saturation Engine:** Multi-stage recursive query auditor checking topic stability and semantic convergence across expanding narrative cohorts.
-*   **Sentinel Alert Engine:** Instantaneous diagnostic alert dispatcher tracking database write availability, Gemini token quotas, and scraper health.
+*   **Sentinel Alert Engine:** Instantaneous diagnostic alert dispatcher tracking database write availability, LLM token quotas, and scraper health.
 *   **Master Visualization Engine:** Cloud generation pipeline synthesizing thousands of recent posts directly from the vector lake.
 
 ---
@@ -162,7 +162,7 @@ For engineering leaders, research institutions, or recruiters interested in a li
 ## 8. What I Would Point You To
 
 *   **Engineering for Fragile External APIs:** How the ingestion pipelines gracefully manage brittle third-party social APIs through jittered backoffs, pagination boundaries, and duplicate filtering without incurring rate-limit bans or data loss.
-*   **Cost-Conscious AI Architecture:** Achieving high-accuracy clinical classification across millions of tokens using batched lightweight models (`gemini-3.5-flash-lite`) and multi-stage triage, keeping monthly API bills under double digits.
+*   **Cost-Conscious AI Architecture:** Achieving high-accuracy clinical classification across millions of tokens using batched lightweight LLMs and multi-stage triage, keeping monthly API bills under double digits.
 *   **Production Vector Database Discipline:** Migrating from naive in-memory or high-overhead HNSW structures to a tuned `IVFFlat` index with proper centroid distribution, maintaining sub-second query times over 260k+ rows.
 *   **Defensive Reliability Engineering:** Building self-healing pipelines backed by the Sentinel Alert Engine, ensuring silent success when operations are normal but immediate notification with diagnostic traces upon external service degradation.
 

@@ -60,16 +60,16 @@ Brandori solves this by providing a standardized, elegant medium where marketing
 ```
    Browser (React 19 SPA)
          |
-         |  TanStack Query v5 Cache + Supabase JS Client (RLS-enforced)
+         |  TanStack Query v5 Cache + Database Client (RLS-enforced)
          v
    +---------------------------------------+      +---------------------------+
-   |  Supabase Postgres                    | <--> |  Edge Functions (Deno)    |
+   |  Managed PostgreSQL                   | <--> |  Edge Functions (Deno)    |
    |  - Row Level Security (RLS) policies  |      |  - AI narrative generator |
-   |  - Automated timestamps & triggers    |      |  - Email dispatch (Resend)|
+   |  - Automated timestamps & triggers    |      |  - Transactional email    |
    |  - User profiles & campaigns tables   |      |  - Verification workers   |
    +---------------------------------------+      +---------------------------+
                         |
-                        +---> Supabase Storage (Campaign assets, responsive avatars)
+                        +---> Cloud Object Storage (Campaign assets, responsive avatars)
 ```
 
 ### Architectural Conviction: Why a Cache-Primed SPA over Next.js SSR?
@@ -77,7 +77,7 @@ Brandori solves this by providing a standardized, elegant medium where marketing
 Early prototypes considered server-side rendering (SSR), but deliberate benchmarks revealed critical trade-offs for portfolio platforms:
 1. **0ms Perceived Transition Latency:** On portfolio sites, visitors browse between multiple projects by the same creator. Serverless SSR hops incur cold-start latency and full document reconciliations on every project click. Brandori loads the creator's profile payload once and synchronously seeds the TanStack Query campaign cache on card click, enabling instant `0ms` navigation.
 2. **Layout Shell Preservation:** Router architecture wraps the view inside persistent layout boundaries, isolating Suspense strictly to dynamic content outlets. The navigation bar, jump scrubber, and global chrome stay mounted without flicker.
-3. **Low-Cost Global Edge Deployment:** As a purely static SPA bundle distributed across global CDN edges backed by Supabase Postgres, the platform achieves near-perfect Lighthouse scores without running persistent Node.js server infrastructure.
+3. **Low-Cost Global Edge Deployment:** As a purely static SPA bundle distributed across global CDN edges backed by managed PostgreSQL, the platform achieves near-perfect Lighthouse scores without running persistent Node.js server infrastructure.
 
 ### Resilience & Edge State Handling
 
@@ -98,12 +98,12 @@ Early prototypes considered server-side rendering (SSR), but deliberate benchmar
 | **State & Data Fetching** | TanStack Query v5 (stale-while-revalidate, cache seeding, optimistic updates) |
 | **Styling & Design System** | Tailwind CSS 3, custom Charcoal & Cream design tokens, KaTeX typography |
 | **Interactive & Gestures** | Native Pointer Capture API, @dnd-kit (drag-and-drop campaign reordering) |
-| **Data & Storage** | Supabase Postgres (RLS, stored triggers), Supabase Object Storage |
-| **Backend & Serverless** | Supabase Edge Functions (Deno runtime) |
-| **AI Integration** | Google Gemini API (context-aware campaign synthesis and copy polish) |
+| **Data & Storage** | Managed PostgreSQL (RLS, stored triggers), Cloud Object Storage |
+| **Backend & Serverless** | Serverless Edge Functions (Deno runtime) |
+| **AI Integration** | LLM API (context-aware campaign synthesis and copy polish) |
 | **Analytics & Charts** | Recharts (portfolio engagement insights) |
 | **Testing & CI** | Playwright (multi-tier smoke tests & E2E flows in GitHub Actions) |
-| **Hosting & CDN** | Vercel (Edge SPA hosting), Supabase Cloud |
+| **Hosting & CDN** | Global Edge CDN (static SPA hosting), Managed Cloud Infrastructure |
 
 ---
 
